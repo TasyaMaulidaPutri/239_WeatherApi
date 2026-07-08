@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Cuaca</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  :root{
+    --sky-top:#3E7CB1;
+    --sky-bottom:#81C3D7;
+    --card-bg:#FFFFFF;
+    --accent:#F6A24C;
+    --text-dark:#1F2A37;
+    --text-muted:#6B7684;
+    --border:#E9EDF2;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Segoe UI', system-ui, sans-serif;
+    background:linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+    padding:24px;
+  }
+
+  .card{
+    background:var(--card-bg);
+    border-radius:20px;
+    padding:28px 28px 32px;
+    width:100%;
+    max-width:400px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.15);
+    text-align:center;
+  }
+
+  .identitas{
+    text-align:left;
+    background:#F7F9FB;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 14px;
+    margin-bottom:20px;
+    font-size:13px;
+    color:var(--text-dark);
+    line-height:1.6;
+  }
+
+  .identitas b{
+    color:var(--text-muted);
+    font-weight:600;
+    display:inline-block;
+    width:50px;
+  }
+
+  .card h2{
+    margin:0 0 4px;
+    font-size:14px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    font-weight:600;
+  }
+
+  #searchForm{
+    display:flex;
+    gap:8px;
+    margin:18px 0 24px;
+  }
+
+  #name{
+    flex:1;
+    padding:10px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:14px;
+    outline:none;
+    transition:border-color .2s;
+  }
+
+  #name:focus{ border-color:var(--accent); }
+
+  #searchForm button{
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    background:var(--accent);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:transform .15s, background .15s;
+  }
+
+  #searchForm button:hover{
+    background:#e78c2e;
+    transform:translateY(-1px);
+  }
+
+  .lokasi-nama{
+    font-size:20px;
+    font-weight:700;
+    color:var(--text-dark);
+    margin:0;
+  }
+
+  .lokasi-region{
+    font-size:13px;
+    color:var(--text-muted);
+    margin:2px 0 0;
+  }
+
+  .suhu{
+    font-size:56px;
+    font-weight:800;
+    color:var(--text-dark);
+    margin:10px 0 0;
+    line-height:1;
+  }
+
+  .suhu span{
+    font-size:22px;
+    font-weight:500;
+    color:var(--text-muted);
+  }
+
+  .status{
+    margin-top:6px;
+    font-size:13px;
+    color:var(--text-muted);
+    min-height:16px;
+  }
+
+  .info-grid{
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    text-align:left;
+  }
+
+  .info-item{
+    background:#F7F9FB;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+  }
+
+  .info-item .label{
+    font-size:11px;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    font-weight:600;
+  }
+
+  .info-item .value{
+    font-size:15px;
+    font-weight:700;
+    color:var(--text-dark);
+    margin-top:2px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+
+    <div class="identitas">
+      <div><b>Nama</b> : Tasya Maulida Putri</div>
+      <div><b>NIM</b> : 20240140239</div>
+    </div>
+
+    <h2>Cuaca Hari Ini</h2>
+
+    <form id="searchForm">
+      <input type="text" id="name" name="name" placeholder="Nama kota...">
+      <button type="submit">Cari</button>
+    </form>
+
+    <p class="lokasi-nama" id="lokasiNama">—</p>
+    <p class="lokasi-region" id="lokasiRegion">&nbsp;</p>
+    <p class="suhu" id="suhuTampil">--<span>°C</span></p>
+    <p class="status" id="statusText"></p>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Country</div>
+        <div class="value" id="country">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Region</div>
+        <div class="value" id="region">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Lat</div>
+        <div class="value" id="lat">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Lon</div>
+        <div class="value" id="lon">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Temp (°F)</div>
+        <div class="value" id="f">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Humidity</div>
+        <div class="value" id="humidity">—</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function getWeather(kota) {
+    const urlapi = "http://api.weatherapi.com/v1/current.json?key=e8a06e02c667464e9ec24926260807&q=" + kota + "&aqi=no";
+    const status = document.getElementById("statusText");
+    status.textContent = "Mencari...";
+
+    $.ajax({
+      url: urlapi,
+      method: "GET",
+      success: function(data) {
+        console.log(data);
+
+        document.getElementById("lokasiNama").textContent = data.location.name + ", " + data.location.country;
+        document.getElementById("lokasiRegion").textContent = data.location.region;
+        document.getElementById("suhuTampil").innerHTML = data.current.temp_c + "<span>°C</span>";
+        document.getElementById("name").value = data.location.name;
+
+        document.getElementById("country").textContent  = data.location.country;
+        document.getElementById("region").textContent   = data.location.region;
+        document.getElementById("lat").textContent      = data.location.lat;
+        document.getElementById("lon").textContent      = data.location.lon;
+        document.getElementById("f").textContent         = data.current.temp_f + " °F";
+        document.getElementById("humidity").textContent  = data.current.humidity + " %";
+
+        status.textContent = "";
+      },
+      error: function(error) {
+        console.log(error);
+        status.textContent = "Kota tidak ditemukan, coba lagi.";
+      }
+    });
+  }
+
+  getWeather("Yogyakarta");
+
+  document.getElementById("searchForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const kotaBaru = document.getElementById("name").value.trim();
+    if (kotaBaru) getWeather(kotaBaru);
+  });
+</script>
+
+</body>
+</html>
